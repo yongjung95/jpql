@@ -19,13 +19,19 @@ public class JpaMain {
 
         try {
 
+            Team team = new Team();
+            team.setName("TeamA");
+            em.persist(team);
+
             Member member = new Member();
             member.setUsername("member1");
+            member.changeTeam(team);
+
             em.persist(member);
 
-            List<Member> result = em.createQuery("select m from Member m left join m.team t", Member.class)
-                    .getResultList();
+            int result = em.createQuery("select size(t.members) from Team t", Integer.class).getSingleResult();
 
+            System.out.println(result);
             tx.commit();
         }catch (Exception e){
             tx.rollback();
