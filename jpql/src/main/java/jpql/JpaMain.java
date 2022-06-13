@@ -23,7 +23,7 @@ public class JpaMain {
             member.setUsername("member1");
             em.persist(member);
 
-            List<Member> result = em.createQuery("select m from Member m", Member.class)
+            List<Member> result = em.createQuery("select m from Member m left join m.team t", Member.class)
                     .getResultList();
 
             tx.commit();
