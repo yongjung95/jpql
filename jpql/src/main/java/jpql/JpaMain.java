@@ -19,19 +19,42 @@ public class JpaMain {
 
         try {
 
-            Team team = new Team();
-            team.setName("TeamA");
-            em.persist(team);
+            Team teamA = new Team();
+            teamA.setName("TeamA");
+            em.persist(teamA);
 
-            Member member = new Member();
-            member.setUsername("member1");
-            member.changeTeam(team);
+            Team teamB = new Team();
+            teamB.setName("TeamB");
+            em.persist(teamB);
 
-            em.persist(member);
+            Member member1 = new Member();
+            member1.setUsername("member1");
+            member1.changeTeam(teamA);
+            em.persist(member1);
 
-            int result = em.createQuery("select size(t.members) from Team t", Integer.class).getSingleResult();
+            Member member2 = new Member();
+            member2.setUsername("member2");
+            member2.changeTeam(teamA);
+            em.persist(member2);
 
-            System.out.println(result);
+            Member member3 = new Member();
+            member3.setUsername("member3");
+            member3.changeTeam(teamB);
+            em.persist(member3);
+
+            em.flush();
+            em.clear();
+
+            List<Team> result = em.createQuery("select distinct t from Team t join fetch t.members", Team.class).getResultList();
+
+            for (Team team : result) {
+                System.out.println("teamname = " + team.getName() + ", team = " + team);
+                for (Member member : team.getMembers()) {
+                    //페치 조인으로 팀과 회원을 함께 조회해서 지연 로딩 발생 안함
+                    System.out.println("-> username = " + member.getUsername()+ ", member = " + member);
+                }
+            }
+
             tx.commit();
         }catch (Exception e){
             tx.rollback();
